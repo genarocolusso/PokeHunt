@@ -48,7 +48,7 @@ const platforms: Record<string, string[]> = {
 
 export default function PokemonHunt() {
   const [search, setSearch] = useState("");
-  const [increaseInterval, setIncreaseInterva] = useState(1);
+  const [increaseInterval] = useState(1);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("Game Boy");
   const [selectedGame, setSelectedGame] = useState<string>(platforms["Game Boy"][0]);
   const [pokemonNumber, setPokemonNumber] = useState<number | null>(null);
@@ -57,8 +57,6 @@ export default function PokemonHunt() {
   const [pokemonList, setPokemonList] = useState<{ id: number; name: string }[]>([]);
 
   const addShinyPokemon = useShinyStore((state) => state.addShinyPokemon);
-  const shinyPokemons = useShinyStore((state) => state.shinyPokemons);
-  const resetShinyPokemons = useShinyStore((state) => state.resetShinyPokemons);
 
   // Exemplo: adicionar shiny quando encontrar
   const handleFoundShiny = () => {

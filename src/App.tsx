@@ -27,7 +27,7 @@ function App() {
       <div className="h-16 relative w-full flex justify-end items-center bg-[#1d1d1d] overflow-hidden">
         {/* First copy */}
         <div ref={listRef} className={`${hasScroll ? "animate-infinite-scroll" : ""} flex absolute group/scroll`}>
-          {shinyPokemons.map((poke, index) => {
+          {shinyPokemons.map((poke) => {
             return (
               <div
                 key={`first-${poke.id}`}
@@ -48,7 +48,7 @@ function App() {
             className={`${hasScroll ? "animate-infinite-scroll" : ""} flex absolute group/scroll`}
             style={{ right: `-${fullWidthTranslateSize}px` }}
           >
-            {shinyPokemons.map((poke, index) => {
+            {shinyPokemons.map((poke) => {
               return (
                 <div
                   key={`first-${poke.id}`}
