@@ -200,12 +200,14 @@ export default function PokemonHunt() {
             ))}
           </select>
         </FadeInMotion>
-        <button
-          onClick={handleSetPokemon}
-          className="ml-2 bg-sky-500 hover:bg-sky-600 px-6 py-3 rounded-full font-bold"
-        >
-          SET
-        </button>
+        <FadeInMotion delay={1.8}>
+          <button
+            onClick={handleSetPokemon}
+            className="ml-2 bg-sky-500 hover:bg-sky-600 px-6 py-3 rounded-full font-bold"
+          >
+            SET
+          </button>
+        </FadeInMotion>
       </div>
 
       {/* Pokémon hunt card */}
