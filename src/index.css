@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+:root {
+  --time: 1.2s;
+}
+
 .animate-infinite-scroll {
   display: flex;
   animation: infinite-scroll 30s linear infinite;
@@ -11,5 +15,34 @@
   }
   100% {
     transform: translateX(-100%);
+  }
+}
+
+.animate-fadein {
+  animation: fade-in var(--time) linear;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-bounce {
+  animation: bounce-2 0.9s linear infinite;
+}
+
+@keyframes bounce-2 {
+  0%,
+  100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.9, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
 }
