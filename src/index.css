@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@layer base {
+  body {
+    @apply bg-gray-900; /* Replace bg-blue-500 with your desired Tailwind color class */
+  }
+}
 :root {
   --time: 1.2s;
 }

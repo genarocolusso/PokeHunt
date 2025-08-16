@@ -157,7 +157,7 @@ export default function PokemonHunt() {
     : null;
 
   return (
-    <div className="p-6 bg-gray-900 min-h-screen flex flex-col items-center text-white">
+    <div className="p-6    flex flex-col items-center text-white">
       {/* Search / selects */}
       <div className="flex w-full max-w-4xl mb-4 gap-2">
         <div className="w-2/4">
