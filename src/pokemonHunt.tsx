@@ -162,7 +162,7 @@ export default function PokemonHunt() {
       <motion.h1
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ delay: 2.5, duration: 1.9, ease: "easeOut" }}
+        transition={{ delay: 1.5, duration: 1.9, ease: "easeOut" }}
         className="mb-8 
       bg-linear-to-r from-amber-300 to-sky-400 bg-clip-text text-5xl font-extrabold text-transparent"
       >
