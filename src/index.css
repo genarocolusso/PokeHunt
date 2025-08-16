@@ -51,3 +51,26 @@
     animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
 }
+
+.animate-border-pulse {
+  animation: border-pulse 3s ease-in-out infinite;
+}
+
+@keyframes border-pulse {
+  0% {
+    border-color: #10b981; /* emerald-500 */
+    box-shadow: 0 2px 6px #10b981;
+  }
+  33% {
+    border-color: #0ea5e9; /* sky-500 */
+    box-shadow: 0 2px 6px #0ea5e9;
+  }
+  66% {
+    border-color: #8b5cf6; /* violet-500 */
+    box-shadow: 0 2px 6px #8b5cf6;
+  }
+  100% {
+    border-color: #10b981; /* loop back to emerald */
+    box-shadow: 0 2px 6px #10b981;
+  }
+}
