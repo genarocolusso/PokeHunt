@@ -66,7 +66,7 @@ function App() {
       )}
 
       <nav className="bg-gray-900/80 h-20 w-full py-4 px-6 flex items-center">
-        <h1 className="text-3xl font-bold group-hover/scroll:text-amber-200">PokeHunt</h1>
+        <h1 className="text-3xl font-bold group-hover/scroll:text-amber-200">PokeShinyHunt</h1>
       </nav>
       <PokemonHunt />
     </>
