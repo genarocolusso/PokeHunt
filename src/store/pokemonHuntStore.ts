@@ -20,6 +20,8 @@ interface HuntStore {
   selectedGame: string;
   setSelectedGame: (game: string) => void;
 
+  pokemonName: string;
+  setPokemonName: (name: string) => void;
   pokemonNumber: number | null;
   setPokemonNumber: (num: number | null) => void;
 
@@ -53,7 +55,8 @@ export const useHuntStore = create<HuntStore>()(
 
       pokemonNumber: null,
       setPokemonNumber: (num) => set({ pokemonNumber: num }),
-
+      pokemonName: "",
+      setPokemonName: (name) => set({ pokemonName: name }),
       findCount: 0,
       setFindCount: (count) => set({ findCount: count }),
       incrementFindCount: () => set((state) => ({ findCount: state.findCount + state.increaseInterval })),
@@ -71,6 +74,7 @@ export const useHuntStore = create<HuntStore>()(
           selectedPlatform: "Game Boy",
           selectedGame: "",
           pokemonNumber: null,
+          pokemonName: "",
           findCount: 0,
           pokemonData: null,
           pokemonList: [],

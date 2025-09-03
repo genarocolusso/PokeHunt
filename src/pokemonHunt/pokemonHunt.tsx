@@ -1,10 +1,13 @@
 import { useEffect } from "react";
-import { useShinyStore } from "./store/shinyStore";
-import { TimeAgo } from "./components/TimeAgo";
+import { useShinyStore } from "../store/shinyStore";
+import { TimeAgo } from "../components/TimeAgo";
 import { nanoid } from "nanoid";
-import { FadeInMotion } from "./animations/fadeIn";
-import { useHuntStore } from "./store/pokemonHuntStore";
+import { FadeInMotion } from "../animations/fadeIn";
+import { useHuntStore } from "../store/pokemonHuntStore";
 import { motion } from "motion/react";
+import { HuntBar } from "./huntBar";
+import { useAuthStore } from "../store/useAuthStore";
+import { syncHunts } from "../services/hunt/syncHunt";
 
 const fetchPokemonList = async () => {
   const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1025");
@@ -15,49 +18,12 @@ const fetchPokemonList = async () => {
   }));
 };
 
-const platforms: Record<string, string[]> = {
-  "Game Boy": ["Pokémon Red", "Pokémon Blue", "Pokémon Yellow"],
-  "Game Boy Color": ["Pokémon Crystal", "Pokémon Gold", "Pokémon Silver"],
-  "Game Boy Advance": ["Pokémon Ruby", "Pokémon Sapphire", "Pokémon Emerald", "Pokémon FireRed", "Pokémon LeafGreen"],
-  "Nintendo DS": [
-    "Pokémon Diamond",
-    "Pokémon Pearl",
-    "Pokémon Platinum",
-    "Pokémon Black",
-    "Pokémon White",
-    "Pokémon Black 2",
-    "Pokémon White 2",
-    "Pokémon HeartGold",
-    "Pokémon SoulSilver",
-  ],
-  "Nintendo 3DS": [
-    "Pokémon X",
-    "Pokémon Y",
-    "Pokémon Omega Ruby",
-    "Pokémon Alpha Sapphire",
-    "Pokémon Sun",
-    "Pokémon Moon",
-    "Pokémon Ultra Sun",
-    "Pokémon Ultra Moon",
-  ],
-  "Nintendo Switch": [
-    "Pokémon Sword",
-    "Pokémon Shield",
-    "Pokémon Legends: Arceus",
-    "Pokémon Scarlet",
-    "Pokémon Violet",
-    "Pokémon Let's Go Pikachu",
-    "Pokémon Let's Go Eevee",
-  ],
-};
-
 export default function PokemonHunt() {
+  const user = useAuthStore((state) => state.user);
+
   const search = useHuntStore((state) => state.search);
-  const setSearch = useHuntStore((state) => state.setSearch);
   const increaseInterval = useHuntStore((state) => state.increaseInterval);
-  const setSelectedPlatform = useHuntStore((state) => state.setSelectedPlatform);
   const selectedPlatform = useHuntStore((state) => state.selectedPlatform);
-  const setSelectedGame = useHuntStore((state) => state.setSelectedGame);
   const selectedGame = useHuntStore((state) => state.selectedGame);
   const findCount = useHuntStore((state) => state.findCount);
   const setFindCount = useHuntStore((state) => state.setFindCount);
@@ -68,17 +34,20 @@ export default function PokemonHunt() {
   const setPokemonData = useHuntStore((state) => state.setPokemonData);
   const setPokemonList = useHuntStore((state) => state.setPokemonList);
   const pokemonList = useHuntStore((state) => state.pokemonList);
+  const pokemonName = useHuntStore((state) => state.pokemonName);
+  const setPokemonName = useHuntStore((state) => state.setPokemonName);
 
   const addShinyPokemon = useShinyStore((state) => state.addShinyPokemon);
   const currentHunt = useShinyStore((state) => state.currentHunt);
   const setcurrentHunt = useShinyStore((state) => state.setCurrentHunt);
   const resetcurrentHunt = useShinyStore((state) => state.resetCurrentHunt);
   // Exemplo: adicionar shiny quando encontrar
-  const handleFoundShiny = () => {
+  const handleFoundShiny = async () => {
     if (pokemonNumber && pokemonImageUrl) {
       addShinyPokemon({
         pokemonId: pokemonNumber,
         imgUrl: pokemonImageUrl,
+        pokemonName: pokemonName,
         numOfEncounters: findCount,
         game: selectedGame,
         platform: selectedPlatform,
@@ -86,12 +55,16 @@ export default function PokemonHunt() {
       });
       setFindCount(0); // resetar contagem após encontrar shiny
       resetcurrentHunt();
+      if (user) {
+        await syncHunts(user.id);
+      }
     }
   };
   const setCurrentHunt = () => {
     if (pokemonNumber && pokemonImageUrl) {
       setcurrentHunt({
         pokemonId: pokemonNumber,
+        pokemonName: pokemonName,
         imgUrl: pokemonImageUrl,
         numOfEncounters: findCount,
         game: selectedGame,
@@ -109,6 +82,7 @@ export default function PokemonHunt() {
       setcurrentHunt({
         ...currentHunt,
         pokemonId: pokemonNumber,
+        pokemonName: pokemonName,
         imgUrl: pokemonImageUrl,
         numOfEncounters: findCount + increaseInterval,
         game: selectedGame,
@@ -116,7 +90,7 @@ export default function PokemonHunt() {
       });
     }
   };
-  console.log(currentHunt);
+
   useEffect(() => {
     const loadPokemonList = async () => {
       const list = await fetchPokemonList();
@@ -134,16 +108,18 @@ export default function PokemonHunt() {
       const found = pokemonList.find((p) => p.id === num);
       if (found) {
         setPokemonNumber(found.id);
+        setPokemonName(found.name);
         setPokemonData(found);
         setFindCount(0);
         setCurrentHunt();
       } else {
-        alert("Pokémon não encontrado com esse número!");
+        alert("whoops no pokemon with this number");
       }
     } else {
       const found = pokemonList.find((p) => p.name.toLowerCase() === search.toLowerCase());
       if (found) {
         setPokemonNumber(found.id);
+        setPokemonName(found.name);
         setPokemonData(found);
         setFindCount(0);
         setCurrentHunt();
@@ -158,70 +134,20 @@ export default function PokemonHunt() {
     : null;
 
   return (
-    <div className="p-8 flex flex-col items-center text-white">
+    <div className="p-8 flex flex-col items-center text-white w-full md:max-w-4xl ">
       <motion.h1
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1.9, ease: "easeOut" }}
         className="mb-8 
-      bg-linear-to-r from-amber-300 to-sky-400 bg-clip-text text-5xl font-extrabold text-transparent"
+      bg-linear-to-r from-amber-300 to-sky-400 bg-clip-text  text-xl md:text-5xl font-extrabold text-transparent"
       >
         START YOUR SHINY HUNT
       </motion.h1>
-      {/* Search / selects */}
-      <div className="flex w-full max-w-4xl mb-4 gap-2">
-        <div className="w-2/4">
-          <FadeInMotion delay={0.3}>
-            <input
-              type="text"
-              placeholder="Enter Pokémon name or number..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-full bg-gray-100 px-5 py-3 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-400"
-            />
-          </FadeInMotion>
-        </div>
-        <FadeInMotion delay={0.8}>
-          <select
-            value={selectedPlatform}
-            onChange={(e) => {
-              setSelectedPlatform(e.target.value);
-              setSelectedGame(platforms[e.target.value][0]);
-            }}
-            className="rounded-full bg-gray-100 px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-sky-400"
-          >
-            {Object.keys(platforms).map((platform) => (
-              <option key={platform} value={platform}>
-                {platform}
-              </option>
-            ))}
-          </select>
-        </FadeInMotion>
-        <FadeInMotion delay={1.3}>
-          <select
-            value={selectedGame}
-            onChange={(e) => setSelectedGame(e.target.value)}
-            className="rounded-full bg-gray-100 px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-sky-400"
-          >
-            {platforms[selectedPlatform].map((game) => (
-              <option key={game} value={game}>
-                {game}
-              </option>
-            ))}
-          </select>
-        </FadeInMotion>
-        <FadeInMotion delay={1.8}>
-          <button
-            onClick={handleSetPokemon}
-            className="ml-2 bg-sky-500 hover:bg-sky-600 px-6 py-3 rounded-full font-bold"
-          >
-            SET
-          </button>
-        </FadeInMotion>
-      </div>
+      <HuntBar handleSetPokemon={handleSetPokemon} />
 
       {/* Pokémon hunt card */}
-      <div className="w-full max-w-4xl ">
+      <div className="w-full md:max-w-4xl ">
         <FadeInMotion delay={1.3}>
           <div className="bg-gray-800 border-1 border-sky-400/40 animate-border-pulse p-6 rounded-lg flex flex-col items-center ">
             {pokemonData ? (
@@ -264,7 +190,7 @@ export default function PokemonHunt() {
                     </div>
                   )}
                 </div>
-                <div className="mt-4 flex gap-2">
+                <div className="mt-4 flex flex-col md:flex-row gap-2">
                   <button className="bg-black px-4 py-2 rounded-full">Configs</button>
 
                   <button className="bg-black px-4 py-2 rounded-full">Export all hunts</button>

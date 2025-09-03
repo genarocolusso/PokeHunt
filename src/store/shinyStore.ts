@@ -6,6 +6,7 @@ import { nanoid } from "nanoid";
 interface ShinyPokemon {
   id: string; // ID único do registro
   pokemonId: number; // ID do Pokémon
+  pokemonName: string;
   imgUrl: string; // URL da imagem
   platform: string;
   game: string;
@@ -19,12 +20,14 @@ interface ShinyStore {
   setCurrentHunt: (pokemon: ShinyPokemon) => void;
   addShinyPokemon: (pokemon: {
     pokemonId: number;
+    pokemonName: string;
     imgUrl: string;
     numOfEncounters: number;
     game: string;
     platform: string;
     startedAt: Date | string;
   }) => void;
+  removePokemon: (pokemonid: string) => void;
   resetShinyPokemons: () => void;
   resetCurrentHunt: () => void;
 }
@@ -35,10 +38,11 @@ export const useShinyStore = create<ShinyStore>()(
       shinyPokemons: [],
       currentHunt: null,
       setCurrentHunt: (pokemon: ShinyPokemon) => set(() => ({ currentHunt: pokemon })),
-      addShinyPokemon: ({ pokemonId, imgUrl, numOfEncounters, game, platform, startedAt }) => {
+      addShinyPokemon: ({ pokemonId, pokemonName, imgUrl, numOfEncounters, game, platform, startedAt }) => {
         const newShiny: ShinyPokemon = {
           id: nanoid(),
           pokemonId,
+          pokemonName,
           imgUrl,
           platform,
           game,
@@ -48,6 +52,12 @@ export const useShinyStore = create<ShinyStore>()(
         set((state) => ({
           shinyPokemons: [...state.shinyPokemons, newShiny],
         }));
+      },
+      removePokemon: (removedID) => {
+        set((state) => {
+          const newpokemons = state.shinyPokemons.filter((poke) => poke.id != removedID);
+          return { shinyPokemons: newpokemons };
+        });
       },
       resetShinyPokemons: () => set({ shinyPokemons: [] }),
       resetCurrentHunt: () =>

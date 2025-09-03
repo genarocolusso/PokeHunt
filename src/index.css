@@ -2,7 +2,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-900; /* Replace bg-blue-500 with your desired Tailwind color class */
+    @apply bg-gradient-to-br  dark:from-gray-900 dark:to-gray-800;
   }
 }
 :root {
